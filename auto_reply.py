@@ -36,7 +36,7 @@ api_id, api_hash = parse_api()
 client = TelegramClient('auto_reply', api_id, api_hash, sequential_updates=True).start()
 
 # Messages of the auto reply
-reply_msg = input("Enter your event:")
+user_event = input("Enter your event:")
 
 # Step 4: Define async main method
 async def main():
@@ -56,44 +56,39 @@ async def main():
             user = sender.to_dict()
             msg = event.message.to_dict()
             msg_text = msg['message'].lower()
-            count_filter = 0;
 
-            print(msg_text)
-
-            filter_word = ['xq', 'xien quay', 'xiên quay']
-
-            for w in filter_word:
-                if msg_text.find(w) >= 0:
-                    count_filter = count_filter + 1
-                    msg_text = msg_text.replace(w, "xiên ghepx2")
+            count_filter, message = string_handler(msg_text)
+            print(count_filter)
 
             if count_filter > 0:
                 time.sleep(2)
-                await event.reply(msg_text)
-
-            # msg_text = msg['message'].split()
-
-            # for word in msg_text:
-            #     if word.startswith("ba"):
-            #         word = word.replace('ba', 'ca')
-            #         print(word)
-
-            #         # auto reply to the message
-            #         time.sleep(2)
-            #         await event.reply(word)
+                await event.reply(message)
 
             # save the log message to csv
-            # file_exists = os.path.isfile('log.csv')
-            # with open('log.csv', 'a+') as log_file:
-            #     writer = csv.writer(log_file, lineterminator="\n")
+            file_exists = os.path.isfile('log.csv')
+            with open('log.csv', 'a+') as log_file:
+                writer = csv.writer(log_file, lineterminator="\n")
 
-            #     if not file_exists:
-            #         writer.writerow(['user', 'message', 'Time'])
-            #     else:
-            #         writer.writerow("zxczxczx")
+                if not file_exists:
+                    writer.writerow(['Event','Username', 'Firstname', 'Lastname', 'Message', 'Time'])
+                
+                writer.writerow([user_event, user['username'], user['first_name'], user['last_name'], msg['message'], time.asctime()])
 
 # The below code printing the start time
 print(time.asctime(), '-', 'Auto-replying...')
+
+def string_handler(message):
+    count_filter = 0;
+    filter_word = ['xq', 'xien quay', 'xiên quay']
+
+    for w in filter_word:
+        if message.find(w) >= 0:
+            print(w)
+            count_filter = count_filter + message.count(w)
+            message = message.replace(w, "xiên ghepx2")
+            print(count_filter)
+
+    return count_filter, message
 
 # Step 6: The client run until disconnected
 with client:
