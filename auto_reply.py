@@ -55,16 +55,32 @@ async def main():
             sender = await event.get_sender()
             user = sender.to_dict()
             msg = event.message.to_dict()
-            msg_text = msg['message'].split()
+            msg_text = msg['message'].lower()
+            count_filter = 0;
 
-            for word in msg_text:
-                if word.startswith("ba"):
-                    word = word.replace('ba', 'ca')
-                    print(word)
+            print(msg_text)
 
-                    # auto reply to the message
-                    time.sleep(2)
-                    await event.reply(word)
+            filter_word = ['xq', 'xien quay', 'xiên quay']
+
+            for w in filter_word:
+                if msg_text.find(w) >= 0:
+                    count_filter = count_filter + 1
+                    msg_text = msg_text.replace(w, "xiên ghepx2")
+
+            if count_filter > 0:
+                time.sleep(2)
+                await event.reply(msg_text)
+
+            # msg_text = msg['message'].split()
+
+            # for word in msg_text:
+            #     if word.startswith("ba"):
+            #         word = word.replace('ba', 'ca')
+            #         print(word)
+
+            #         # auto reply to the message
+            #         time.sleep(2)
+            #         await event.reply(word)
 
             # save the log message to csv
             # file_exists = os.path.isfile('log.csv')
