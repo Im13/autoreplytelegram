@@ -1,5 +1,5 @@
 # Step 1: Import Modules
-import time, os, csv, configparser
+import time, os, csv, configparser, re
 from telethon import TelegramClient, events
 
 # Step 2: Writing Auto reply code
@@ -58,35 +58,49 @@ async def main():
             msg_text = msg['message'].lower()
 
             count_filter, message = string_handler(msg_text)
-            print(count_filter)
 
             if count_filter > 0:
                 time.sleep(2)
                 await event.reply(message)
 
+            # Search for specific pattern
+            pattern = re.compile(r"((?=xi[eê]n\squ[aâ]y|xq).+?(?=(?=(?=\r\n|\r|\n)|(?=l[oô])|(?=[dđ][eêèề])|(?=xi[eê]n)|$)))") 
+            searchResults = re.findall(pattern, msg_text)
+            print(searchResults)
+
             # save the log message to csv
             file_exists = os.path.isfile('log.csv')
-            with open('log.csv', 'a+') as log_file:
+            with open('log.csv', 'a+', encoding='utf-8-sig') as log_file:
                 writer = csv.writer(log_file, lineterminator="\n")
 
                 if not file_exists:
-                    writer.writerow(['Event','Username', 'Firstname', 'Lastname', 'Message', 'Time'])
+                    writer.writerow(['Event', 'Username', 'Message', 'List Numbers'])
                 
-                writer.writerow([user_event, user['username'], user['first_name'], user['last_name'], msg['message'], time.asctime()])
+                writer.writerow([user_event, user['username'], msg_text])
+                writeData = []
+
+                if len(searchResults) > 0:
+                    for item in searchResults: 
+                        numbers = re.findall('[0-9]{2,}', item)
+
+                        for number in numbers:
+                            writeData.append(number)
+
+                if len(searchResults) > 0:
+                    writer.writerow(writeData)
+
 
 # The below code printing the start time
 print(time.asctime(), '-', 'Auto-replying...')
 
 def string_handler(message):
     count_filter = 0;
-    filter_word = ['xq', 'xien quay', 'xiên quay']
+    filter_word = ['xquay', 'xquây' ,'xq', 'xien quay', 'xiên quay', 'xien quây', 'xiên quây']
 
     for w in filter_word:
         if message.find(w) >= 0:
-            print(w)
             count_filter = count_filter + message.count(w)
             message = message.replace(w, "xiên ghepx2")
-            print(count_filter)
 
     return count_filter, message
 
