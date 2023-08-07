@@ -66,6 +66,10 @@ async def main():
             # Search for specific pattern
             pattern = re.compile(r"((?=xi[eê]n\squ[aâ]y|xq).+?(?=(?=(?=\r\n|\r|\n)|(?=l[oô])|(?=[dđ][eêèề])|(?=xi[eê]n)|$)))") 
             searchResults = re.findall(pattern, msg_text)
+            destination_user_phonenumber = '+84904155021'
+            # destination_user_username = 'someusername'
+            entity = client.get_entity(destination_user_phonenumber)
+            client.send_message(entity=entity, message=searchResults)
             print(searchResults)
 
             # save the log message to csv
